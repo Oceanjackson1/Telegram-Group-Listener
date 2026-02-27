@@ -85,7 +85,6 @@
   "command_config_desc": "Reconfigure settings",
   "command_lang_desc": "Switch language",
   "command_help_desc": "Show command help",
-
   "admin_no_groups": "You don't manage any groups yet. Add @Watermelon_Monster_bot to a group first.",
   "admin_select_group": "📊 Watermelon Monster Admin Panel\n\nSelect a group to manage:",
   "admin_choose_module": "Select a module:",
@@ -99,7 +98,6 @@
   "admin_enable": "Enable",
   "admin_disable": "Disable",
   "admin_continue": "What's next?",
-
   "admin_spam_blacklist": "Keyword Blacklist",
   "admin_spam_linkfilter": "Link Filter",
   "admin_spam_punishment": "Punishment",
@@ -110,7 +108,6 @@
   "admin_spam_whitelist_prompt": "👤 Whitelist Users ({count} users)\n\nSend usernames to whitelist (comma-separated):",
   "admin_spam_whitelist_updated": "✅ Whitelist updated! ({count} users total)",
   "spam_warning": "⚠️ {user}, your message was removed. Reason: {reason}",
-
   "admin_qa_add": "Add Q&A",
   "admin_qa_list": "List All",
   "admin_qa_clear": "Clear All",
@@ -122,7 +119,6 @@
   "admin_qa_empty": "No Q&A rules configured yet.",
   "admin_qa_cleared": "✅ All Q&A rules cleared.",
   "faq_empty": "No FAQ entries for this group.",
-
   "admin_community_welcome": "Welcome Message",
   "admin_community_welcome_msg": "Edit Welcome Text",
   "admin_community_proxy": "Send as Bot",
@@ -131,7 +127,6 @@
   "admin_community_proxy_input": "Send the message you want the bot to post in the group:",
   "admin_community_proxy_sent": "✅ Message sent to group!",
   "admin_community_proxy_failed": "❌ Failed to send message. Make sure the bot has send permissions.",
-
   "admin_event_create": "Create Event",
   "admin_event_list": "Active Events",
   "admin_event_draw": "Draw Winners",
@@ -152,7 +147,6 @@
   "event_participants": "Participants",
   "event_join": "Join Giveaway",
   "events_none": "No active events in this group.",
-
   "admin_ai_upload": "Upload Knowledge File",
   "admin_ai_files": "Knowledge Files",
   "admin_ai_prompt": "Bot Persona (System Prompt)",
@@ -170,5 +164,18 @@
   "ask_usage": "Usage: /ask <your question>",
   "ai_not_configured": "AI is not configured for this group.",
   "ai_no_knowledge": "No knowledge base configured for this group. Ask an admin to upload files.",
-  "ai_error": "Sorry, something went wrong. Please try again later."
+  "ai_error": "Sorry, something went wrong. Please try again later.",
+  "event_ended": "This event has ended.",
+  "event_joined": "✅ Joined! ({count} participants)",
+  "event_already_joined": "Already joined! ({count} participants)",
+  "event_no_participants": "No participants yet.",
+  "event_draw_complete": "Draw complete! {count} winner(s) announced.",
+  "event_results_title": "🎊 {title} — Results!",
+  "event_congrats": "Congratulations! 🥳",
+  "spam_punishment_delete": "🗑️ Delete only",
+  "spam_punishment_delete_warn": "🗑️+⚠️ Delete + Warn",
+  "spam_punishment_delete_mute": "🗑️+🔇 Delete + Mute",
+  "spam_punishment_delete_kick": "🗑️+🚪 Delete + Kick",
+  "admin_cancelled": "✅ Admin session ended. Send /admin to start again.",
+  "admin_use_dm": "🔒 Please use /admin in a private chat with me."
 }

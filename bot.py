@@ -60,6 +60,7 @@ from handlers.admin import (
     spam_menu_callback,
     spam_punishment_callback,
     spam_whitelist_input,
+    cancel_command,
 )
 from handlers.ai_chat import ai_chat_handler, ask_command
 from handlers.antispam import antispam_handler
@@ -297,10 +298,12 @@ def build_application(token: str):
             ],
         },
         fallbacks=[
+            CommandHandler("cancel", cancel_command),
             CommandHandler("admin", admin_command),
             CommandHandler("help", help_command),
         ],
         allow_reentry=True,
+        conversation_timeout=300,
     )
 
     application.add_handler(setup_flow)

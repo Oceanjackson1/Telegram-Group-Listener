@@ -73,7 +73,14 @@ def _get_gm(context):
 # ─── Entry: /admin ──────────────────────────────────────────────────────────
 
 async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if not update.message or update.effective_chat.type != "private":
+    if not update.message:
+        return ConversationHandler.END
+
+    # If used in group chat, hint the user to go to DM
+    if update.effective_chat.type != "private":
+        i18n = _get_i18n(context)
+        language = "zh"  # default hint
+        await update.message.reply_text(i18n.t(language, "admin_use_dm"))
         return ConversationHandler.END
 
     i18n = _get_i18n(context)
@@ -204,8 +211,8 @@ async def spam_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
     i18n = _get_i18n(context)
     language = _get_user_language(context, query.from_user.id)
 
-    if action == "back":
-        return await _show_group_menu(query, context)
+    if action in ("back", "back_to_spam"):
+        return await _show_spam_menu(query, context) if action == "back_to_spam" else await _show_group_menu(query, context)
 
     if action == "toggle":
         cfg = db.fetchone("SELECT * FROM spam_config WHERE chat_id = ?", (chat_id,))
@@ -241,10 +248,10 @@ async def spam_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if action == "punishment":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🗑️ Delete only", callback_data="spp:delete")],
-            [InlineKeyboardButton("🗑️+⚠️ Delete + Warn", callback_data="spp:delete_warn")],
-            [InlineKeyboardButton("🗑️+🔇 Delete + Mute", callback_data="spp:delete_mute")],
-            [InlineKeyboardButton("🗑️+🚪 Delete + Kick", callback_data="spp:delete_kick")],
+            [InlineKeyboardButton(i18n.t(language, "spam_punishment_delete"), callback_data="spp:delete")],
+            [InlineKeyboardButton(i18n.t(language, "spam_punishment_delete_warn"), callback_data="spp:delete_warn")],
+            [InlineKeyboardButton(i18n.t(language, "spam_punishment_delete_mute"), callback_data="spp:delete_mute")],
+            [InlineKeyboardButton(i18n.t(language, "spam_punishment_delete_kick"), callback_data="spp:delete_kick")],
         ])
         await query.edit_message_text(i18n.t(language, "admin_spam_punishment_select"), reply_markup=keyboard)
         return SPAM_PUNISHMENT_SELECT
@@ -364,6 +371,8 @@ async def qa_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     i18n = _get_i18n(context)
     language = _get_user_language(context, query.from_user.id)
 
+    if action == "back_to_qa":
+        return await _show_qa_menu(query, context)
     if action == "back":
         return await _show_group_menu(query, context)
 
@@ -464,6 +473,8 @@ async def community_menu_callback(update: Update, context: ContextTypes.DEFAULT_
     i18n = _get_i18n(context)
     language = _get_user_language(context, query.from_user.id)
 
+    if action == "back_to_cm":
+        return await _show_community_menu(query, context)
     if action == "back":
         return await _show_group_menu(query, context)
 
@@ -561,6 +572,8 @@ async def event_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     db = _get_db(context)
     chat_id = context.user_data["admin_chat_id"]
 
+    if action == "back_to_ev":
+        return await _show_event_menu(query, context)
     if action == "back":
         return await _show_group_menu(query, context)
 
@@ -753,6 +766,8 @@ async def ai_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     i18n = _get_i18n(context)
     language = _get_user_language(context, query.from_user.id)
 
+    if action == "back_to_ai":
+        return await _show_ai_menu(query, context)
     if action == "back":
         return await _show_group_menu(query, context)
 
@@ -887,3 +902,14 @@ async def ai_system_prompt_input(update: Update, context: ContextTypes.DEFAULT_T
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Back", callback_data="ai:back_to_ai")]])
     await update.message.reply_text(i18n.t(language, "admin_continue"), reply_markup=keyboard)
     return AI_MENU
+
+
+async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Handle /cancel — exit admin conversation."""
+    i18n = _get_i18n(context)
+    language = _get_user_language(context, update.effective_user.id)
+    await update.message.reply_text(i18n.t(language, "admin_cancelled"))
+    context.user_data.pop("admin_chat_id", None)
+    context.user_data.pop("event_draft", None)
+    context.user_data.pop("qa_trigger", None)
+    return ConversationHandler.END

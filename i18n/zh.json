@@ -164,5 +164,18 @@
   "ask_usage": "使用方法：/ask <你的问题>",
   "ai_not_configured": "本群暂未配置 AI 功能。",
   "ai_no_knowledge": "本群暂无知识库。请联系管理员上传文件。",
-  "ai_error": "抱歉，出了点问题。请稍后再试。"
+  "ai_error": "抱歉，出了点问题。请稍后再试。",
+  "event_ended": "此活动已结束。",
+  "event_joined": "✅ 已参加！（{count} 人参与）",
+  "event_already_joined": "已经参加过了！（{count} 人参与）",
+  "event_no_participants": "暂无参与者。",
+  "event_draw_complete": "开奖完成！已公布 {count} 位中奖者。",
+  "event_results_title": "🎊 {title} — 开奖结果！",
+  "event_congrats": "恭喜中奖！🥳",
+  "spam_punishment_delete": "🗑️ 仅删除",
+  "spam_punishment_delete_warn": "🗑️+⚠️ 删除+警告",
+  "spam_punishment_delete_mute": "🗑️+🔇 删除+禁言",
+  "spam_punishment_delete_kick": "🗑️+🚪 删除+踢出",
+  "admin_cancelled": "✅ 管理会话已结束。输入 /admin 重新开始。",
+  "admin_use_dm": "🔒 请在私聊中使用 /admin 命令。"
 }
