@@ -97,7 +97,7 @@ from handlers.config import (
 from handlers.events import event_draw_callback, event_join_callback, events_command
 from handlers.monitor import chat_member_update_handler, monitored_message_handler
 from handlers.qa import faq_command, qa_handler
-from handlers.start import language_select_callback, start_command
+from handlers.start import language_select_callback, start_action_callback, start_command
 from utils.config_store import ConfigStore
 from utils.database import Database
 from utils.group_manager import GroupManager
@@ -179,6 +179,7 @@ def build_application(token: str):
         ],
         states={
             LANG_SELECT: [
+                CallbackQueryHandler(start_action_callback, pattern=r"^sa:"),
                 CallbackQueryHandler(language_select_callback, pattern=r"^set_lang:(en|zh)$"),
             ],
             MONITOR_TYPE: [
