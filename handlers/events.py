@@ -6,6 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from services.events import draw_winners, get_active_events, get_participant_count, join_event
+from utils.progress import ProgressTracker
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,16 @@ async def event_draw_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     chat_id = str(event["chat_id"])
     language = _get_language(context, chat_id)
 
-    winners = draw_winners(db, event_id)
+    async with ProgressTracker(
+        bot=context.bot,
+        chat_id=query.message.chat.id,
+        i18n=i18n,
+        language=language,
+        task_key="progress_drawing_winners",
+        determinate=False,
+    ) as pt:
+        winners = draw_winners(db, event_id)
+
     if not winners:
         msg = i18n.t(language, "event_no_participants") if i18n else "No participants."
         await query.edit_message_text(msg)
@@ -114,11 +124,19 @@ async def event_draw_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
     # Post to group
-    try:
-        target = int(chat_id) if chat_id.lstrip("-").isdigit() else f"@{chat_id}"
-        await context.bot.send_message(chat_id=target, text=text)
-    except Exception as exc:
-        logger.exception("Failed to post draw results: %s", exc)
+    async with ProgressTracker(
+        bot=context.bot,
+        chat_id=query.message.chat.id,
+        i18n=i18n,
+        language=language,
+        task_key="progress_sending_to_group",
+        determinate=False,
+    ):
+        try:
+            target = int(chat_id) if chat_id.lstrip("-").isdigit() else f"@{chat_id}"
+            await context.bot.send_message(chat_id=target, text=text)
+        except Exception as exc:
+            logger.exception("Failed to post draw results: %s", exc)
 
     draw_msg = i18n.t(language, "event_draw_complete", count=len(winners)) if i18n else f"Draw complete! {len(winners)} winner(s)."
     await query.edit_message_text(f"✅ {draw_msg}")

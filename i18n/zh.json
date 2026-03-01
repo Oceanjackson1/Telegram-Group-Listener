@@ -188,6 +188,14 @@
   "spam_punishment_delete_warn": "🗑️+⚠️ 删除+警告",
   "spam_punishment_delete_mute": "🗑️+🔇 删除+禁言",
   "spam_punishment_delete_kick": "🗑️+🚪 删除+踢出",
+  "progress_ai_thinking": "AI 正在思考",
+  "progress_ai_retrieving": "正在检索知识库",
+  "progress_ai_generating": "正在生成回复",
+  "progress_parsing_file": "正在解析文件",
+  "progress_downloading_file": "正在下载文件",
+  "progress_storing_chunks": "正在存储知识分片",
+  "progress_drawing_winners": "正在抽取获奖者",
+  "progress_sending_to_group": "正在发送结果到群组",
   "admin_cancelled": "✅ 管理会话已结束。输入 /admin 重新开始。",
   "admin_use_dm": "🔒 请在私聊中使用 /admin 命令。"
 }

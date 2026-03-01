@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 
+from utils.progress import ProgressTracker
+
 logger = logging.getLogger(__name__)
 
 # Conversation states
@@ -842,8 +844,6 @@ async def ai_file_upload_handler(update: Update, context: ContextTypes.DEFAULT_T
         await update.message.reply_text(i18n.t(language, "admin_ai_unsupported_format"))
         return AI_UPLOAD_FILE
 
-    await update.message.reply_text(i18n.t(language, "admin_ai_parsing"))
-
     # Import file parser service
     from services.file_parser import parse_file
     from services.knowledge import store_file_chunks
@@ -857,25 +857,38 @@ async def ai_file_upload_handler(update: Update, context: ContextTypes.DEFAULT_T
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join(upload_dir, file_name)
 
-    tg_file = await doc.get_file()
-    await tg_file.download_to_drive(file_path)
+    async with ProgressTracker(
+        bot=context.bot,
+        chat_id=update.effective_chat.id,
+        i18n=i18n,
+        language=language,
+        task_key="progress_parsing_file",
+        reply_to_message_id=update.message.message_id,
+    ) as pt:
+        # Step 1: Download
+        await pt.update(0.1, step_key="progress_downloading_file")
+        tg_file = await doc.get_file()
+        await tg_file.download_to_drive(file_path)
 
-    # Parse
-    try:
-        chunks = parse_file(file_path, ext)
-    except Exception as exc:
-        logger.exception("File parse error: %s", exc)
-        await update.message.reply_text(i18n.t(language, "admin_ai_parse_error"))
-        return AI_UPLOAD_FILE
+        # Step 2: Parse
+        await pt.update(0.4, step_key="progress_parsing_file")
+        try:
+            chunks = parse_file(file_path, ext)
+        except Exception as exc:
+            logger.exception("File parse error: %s", exc)
+            await pt.finish_with_text(i18n.t(language, "admin_ai_parse_error"))
+            return AI_UPLOAD_FILE
 
-    # Store
-    total_chars = sum(len(c) for c in chunks)
-    store_file_chunks(db, chat_id, file_name, ext, os.path.getsize(file_path), file_path,
-                      chunks, update.effective_user.id)
+        # Step 3: Store
+        await pt.update(0.7, step_key="progress_storing_chunks")
+        total_chars = sum(len(c) for c in chunks)
+        store_file_chunks(db, chat_id, file_name, ext, os.path.getsize(file_path), file_path,
+                          chunks, update.effective_user.id)
 
-    await update.message.reply_text(
-        i18n.t(language, "admin_ai_upload_success", file_name=file_name, chunks=len(chunks), chars=total_chars)
-    )
+        # Done — replace progress message with success
+        await pt.finish_with_text(
+            i18n.t(language, "admin_ai_upload_success", file_name=file_name, chunks=len(chunks), chars=total_chars)
+        )
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📤 " + i18n.t(language, "admin_ai_upload_more"), callback_data="ai:upload")],
         [InlineKeyboardButton("⬅️ Back", callback_data="ai:back_to_ai")],

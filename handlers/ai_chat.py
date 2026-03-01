@@ -7,6 +7,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from services.ai_chat import get_ai_response, should_ai_respond
+from utils.progress import ProgressTracker
 
 logger = logging.getLogger(__name__)
 
@@ -51,14 +52,28 @@ async def ai_chat_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if not api_key:
         return
 
+    i18n = context.application.bot_data.get("i18n")
+    gm = context.application.bot_data.get("group_manager")
+    language = gm.get_group_language(chat_id) if gm else "en"
+
     try:
-        result = await get_ai_response(
-            db=db,
-            chat_id=chat_id,
-            user_id=message.from_user.id,
-            question=text_cleaned if is_mention else text,
-            api_key=api_key,
-        )
+        async with ProgressTracker(
+            bot=context.bot,
+            chat_id=message.chat.id,
+            i18n=i18n,
+            language=language,
+            task_key="progress_ai_thinking",
+            reply_to_message_id=message.message_id,
+        ) as pt:
+            await pt.update(0.2, step_key="progress_ai_retrieving")
+            result = await get_ai_response(
+                db=db,
+                chat_id=chat_id,
+                user_id=message.from_user.id,
+                question=text_cleaned if is_mention else text,
+                api_key=api_key,
+            )
+            await pt.update(0.9, step_key="progress_ai_generating")
 
         if result and result.get("content"):
             await message.reply_text(result["content"], quote=True)
@@ -95,13 +110,23 @@ async def ask_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return
 
     try:
-        result = await get_ai_response(
-            db=db,
-            chat_id=chat_id,
-            user_id=message.from_user.id,
-            question=question,
-            api_key=api_key,
-        )
+        async with ProgressTracker(
+            bot=context.bot,
+            chat_id=message.chat.id,
+            i18n=i18n,
+            language=language,
+            task_key="progress_ai_thinking",
+            reply_to_message_id=message.message_id,
+        ) as pt:
+            await pt.update(0.2, step_key="progress_ai_retrieving")
+            result = await get_ai_response(
+                db=db,
+                chat_id=chat_id,
+                user_id=message.from_user.id,
+                question=question,
+                api_key=api_key,
+            )
+            await pt.update(0.9, step_key="progress_ai_generating")
 
         if result and result.get("content"):
             await message.reply_text(result["content"], quote=True)

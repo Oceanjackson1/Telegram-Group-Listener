@@ -188,6 +188,14 @@
   "spam_punishment_delete_warn": "🗑️+⚠️ Delete + Warn",
   "spam_punishment_delete_mute": "🗑️+🔇 Delete + Mute",
   "spam_punishment_delete_kick": "🗑️+🚪 Delete + Kick",
+  "progress_ai_thinking": "AI is thinking",
+  "progress_ai_retrieving": "Retrieving knowledge base",
+  "progress_ai_generating": "Generating response",
+  "progress_parsing_file": "Parsing file",
+  "progress_downloading_file": "Downloading file",
+  "progress_storing_chunks": "Storing knowledge chunks",
+  "progress_drawing_winners": "Drawing winners",
+  "progress_sending_to_group": "Sending results to group",
   "admin_cancelled": "✅ Admin session ended. Send /admin to start again.",
   "admin_use_dm": "🔒 Please use /admin in a private chat with me."
 }
